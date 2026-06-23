@@ -192,7 +192,7 @@ metric: test accuracy
 3. 能够正确实现 NT-Xent loss；
 4. 能够完成自监督预训练流程，并保存 loss 记录；
 5. 能够冻结 encoder，完成 linear probe 训练；
-6. 能够报告测试 accuracy，并展示至少 3 张测试图像的预测类别。
+6. 能够报告测试 accuracy，并展示至少 5 张测试图像的预测类别。
 
 ## 7. 最终提交内容
 
@@ -224,6 +224,18 @@ metric: test accuracy
 5. **预测结果展示**
 
    展示至少 5 张 CIFAR-10 测试图片，给出真实类别和模型预测类别。
+   
+7. **学生仓库结构**
+```text
+student-mini-simclr/
+├── README.md:说明项目环境、安装依赖、如何训练、如何评估；
+├── requirements.txt:列出 Python 依赖
+├── .gitignore
+├── code/存放全部实现代码
+├── report/实验报告,loss 曲线、预测样例图等报告图片
+├── logs/训练过程日志
+└── results/保存最终 accuracy、训练数据量、epoch、batch size 等结果
+```
 
 ## 8. 评分建议
 

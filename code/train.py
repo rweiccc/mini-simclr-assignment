@@ -9,7 +9,7 @@ from loss import NTXentLoss
 
 
 BATCH_SIZE = 64
-EPOCHS = 20
+EPOCHS = 2
 LR = 1e-3
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

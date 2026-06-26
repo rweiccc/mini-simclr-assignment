@@ -46,7 +46,7 @@ test_loader = DataLoader(
     test_dataset,
     batch_size=BATCH_SIZE,
     shuffle=False,
-    num_workers=2
+    num_workers=0
 )
 
 simclr = SimCLR()

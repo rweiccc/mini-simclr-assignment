@@ -7,13 +7,17 @@ import torchvision.transforms as transforms
 
 from model import SimCLR
 
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 BATCH_SIZE = 256
 EPOCHS = 10
 LR = 1e-3
 
-os.makedirs("../checkpoints", exist_ok=True)
+
+os.makedirs("checkpoints", exist_ok=True)
+os.makedirs("data", exist_ok=True)
+
 
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -23,19 +27,21 @@ transform = transforms.Compose([
     )
 ])
 
+
 train_dataset = CIFAR10(
-    root="../data",
+    root="data",
     train=True,
-    download=True,
+    download=False,
     transform=transform
 )
 
 test_dataset = CIFAR10(
-    root="../data",
+    root="data",
     train=False,
-    download=True,
+    download=False,
     transform=transform
 )
+
 
 train_loader = DataLoader(
     train_dataset,
@@ -51,11 +57,12 @@ test_loader = DataLoader(
     num_workers=0
 )
 
+
 simclr = SimCLR()
 
 simclr.load_state_dict(
     torch.load(
-        "../checkpoints/simclr.pth",
+        "checkpoints/simclr.pth",
         map_location=DEVICE
     )
 )
@@ -75,6 +82,7 @@ optimizer = torch.optim.Adam(
     classifier.parameters(),
     lr=LR
 )
+
 
 print("=" * 50)
 print("Start Linear Probe Training")
@@ -106,10 +114,8 @@ for epoch in range(EPOCHS):
 
     avg_loss = running_loss / len(train_loader)
 
-    print(
-        f"Epoch [{epoch + 1}/{EPOCHS}] "
-        f"Loss: {avg_loss:.4f}"
-    )
+    print(f"Epoch [{epoch+1}/{EPOCHS}] Loss: {avg_loss:.4f}")
+
 
 classifier.eval()
 
@@ -134,13 +140,15 @@ with torch.no_grad():
 
 accuracy = 100.0 * correct / total
 
+
 print("=" * 50)
 print(f"Linear Probe Accuracy: {accuracy:.2f}%")
 print("=" * 50)
 
+
 torch.save(
     classifier.state_dict(),
-    "../checkpoints/linear_probe.pth"
+    "checkpoints/linear_probe.pth"
 )
 
-print("Linear Probe Model Saved!")
+print("Linear Probe Model Saved to checkpoints/linear_probe.pth")

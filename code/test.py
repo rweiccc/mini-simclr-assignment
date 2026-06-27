@@ -135,7 +135,7 @@ for i in range(5):
 
 plt.tight_layout()
 
-plt.savefig("../results/test_predictions.png")
+plt.savefig("results/test_predictions.png")
 
 plt.show()
 

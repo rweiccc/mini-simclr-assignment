@@ -1,0 +1,5 @@
+dataset_size: 50000
+epochs: 2
+batch_size: 64
+linear_probe_accuracy: 41.51%
+test_accuracy: 41.51%

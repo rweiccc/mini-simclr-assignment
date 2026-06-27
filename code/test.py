@@ -12,20 +12,15 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 BATCH_SIZE = 256
 
-os.makedirs("../results", exist_ok=True)
+os.makedirs("results", exist_ok=True)
+os.makedirs("checkpoints", exist_ok=True)
+os.makedirs("data", exist_ok=True)
 
 classes = (
-    "airplane",
-    "automobile",
-    "bird",
-    "cat",
-    "deer",
-    "dog",
-    "frog",
-    "horse",
-    "ship",
-    "truck"
+    "airplane", "automobile", "bird", "cat", "deer",
+    "dog", "frog", "horse", "ship", "truck"
 )
+
 
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -35,10 +30,11 @@ transform = transforms.Compose([
     )
 ])
 
+
 test_dataset = CIFAR10(
-    root="../data",
+    root="data",
     train=False,
-    download=True,
+    download=False,
     transform=transform
 )
 
@@ -49,11 +45,12 @@ test_loader = DataLoader(
     num_workers=0
 )
 
+
 simclr = SimCLR()
 
 simclr.load_state_dict(
     torch.load(
-        "../checkpoints/simclr.pth",
+        "checkpoints/simclr.pth",
         map_location=DEVICE
     )
 )
@@ -61,11 +58,11 @@ simclr.load_state_dict(
 simclr.to(DEVICE)
 simclr.eval()
 
-classifier = nn.Linear(512, 10)
+classifier = nn.Linear(512, 10).to(DEVICE)
 
 classifier.load_state_dict(
     torch.load(
-        "../checkpoints/linear_probe.pth",
+        "checkpoints/linear_probe.pth",
         map_location=DEVICE
     )
 )
@@ -80,6 +77,7 @@ show_images = []
 show_preds = []
 show_labels = []
 
+
 with torch.no_grad():
 
     for images, labels in test_loader:
@@ -88,7 +86,6 @@ with torch.no_grad():
         labels = labels.to(DEVICE)
 
         features = simclr.encode(images)
-
         outputs = classifier(features)
 
         _, predicted = torch.max(outputs, 1)
@@ -96,15 +93,17 @@ with torch.no_grad():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
+        # collect first 5 images
         if len(show_images) < 5:
-
             remain = 5 - len(show_images)
 
             show_images.extend(images[:remain].cpu())
             show_preds.extend(predicted[:remain].cpu())
             show_labels.extend(labels[:remain].cpu())
 
+
 accuracy = 100.0 * correct / total
+
 
 print("=" * 50)
 print(f"Test Accuracy: {accuracy:.2f}%")
@@ -120,12 +119,10 @@ for i in range(5):
     img = show_images[i]
 
     img = img * std + mean
-    img = torch.clamp(img,0,1)
+    img = torch.clamp(img, 0, 1)
 
-    plt.subplot(1,5,i+1)
-
+    plt.subplot(1, 5, i+1)
     plt.imshow(img.permute(1,2,0))
-
     plt.axis("off")
 
     plt.title(
@@ -139,5 +136,6 @@ plt.savefig("results/test_predictions.png")
 
 plt.show()
 
+
 print("Prediction image saved to:")
-print("../results/test_predictions.png")
+print("results/test_predictions.png")
